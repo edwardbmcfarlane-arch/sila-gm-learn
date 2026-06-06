@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1A1A2E">
+<title>GM Learning Path · Sila Services</title>
+<style>
+  /* =====================================================================
+     PERFORMS Learning Path App — Dashboard Frontend v1.0
+     Sila Services · GM Success Coach Program
+     Brand: Arial · Sila Orange #E05A2B · Navy #1A1A2E · pillar colors from payload
+     ===================================================================== */
+  :root {
+    --orange: #E05A2B;
+    --orange-soft: #FBE9E1;
+    --navy: #1A1A2E;
+    --navy-2: #24243A;
+    --navy-3: #2F2F4A;
+    --ink: #23232E;
+    --muted: #6B6B7A;
+    --line: #E6E4E0;
+    --paper: #F6F5F2;
+    --card: #FFFFFF;
+    --green: #2E7D4F;
+    --green-soft: #E4F1E9;
+    --blue: #2D7DD2;
+    --blue-soft: #E5EFFA;
+    --red: #B83232;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(26,26,46,.06), 0 4px 14px rgba(26,26,46,.07);
+    --shadow-lift: 0 2px 6px rgba(26,26,46,.10), 0 10px 28px rgba(26,26,46,.13);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.45;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; }
+  .hidden { display: none !important; }
+
+  /* ---------- shared shell ---------- */
+  .shell { max-width: 520px; margin: 0 auto; padding-bottom: 110px; }
+  @media (min-width: 760px) { .shell { max-width: 680px; } }
+
+  /* ---------- header band ---------- */
+  .band {
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 70%, #2A2A44 100%);
+    color: #fff;
+    padding: calc(env(safe-area-inset-top, 0px) + 18px) 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .band::after {
+    content: ""; position: absolute; right: -60px; top: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(224,90,43,.22) 0%, rgba(224,90,43,0) 70%);
+    pointer-events: none;
+  }
+  .brandline { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .wordmark { font-size:13px; font-weight:bold; letter-spacing:2.5px; text-transform:uppercase; }
+  .wordmark .sila { color: var(--orange); }
+  .signout { color: rgba(255,255,255,.55); font-size:12px; padding:6px 4px; }
+  .signout:active { color:#fff; }
+  .band h1 { font-size: 24px; font-weight: bold; margin-top: 14px; letter-spacing:-.2px; }
+  .band .sub { font-size: 13px; color: rgba(255,255,255,.65); margin-top: 4px; }
+  .band .bigstat { display:flex; align-items:baseline; gap:8px; margin-top:16px; }
+  .band .bigstat b { font-size: 40px; letter-spacing:-1px; }
+  .band .bigstat span { font-size: 14px; color: rgba(255,255,255,.7); }
+  .ring-row { display:flex; align-items:center; gap:18px; margin-top: 6px; }
+  .overall-track { flex:1; height:8px; background:rgba(255,255,255,.14); border-radius:4px; overflow:hidden; }
+  .overall-fill { height:100%; background: var(--orange); border-radius:4px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+
+  /* ---------- pace banner ---------- */
+  .pace {
+    margin: -14px 16px 0; position: relative; z-index: 2;
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 14px 16px;
+    display:flex; align-items:center; gap: 12px;
+    border-left: 5px solid var(--muted);
+  }
+  .pace.ok     { border-left-color: var(--green); }
+  .pace.ahead  { border-left-color: var(--blue); }
+  .pace.behind { border-left-color: var(--orange); }
+  .pace .dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; background: var(--muted); }
+  .pace.ok .dot { background: var(--green); } .pace.ahead .dot { background: var(--blue); } .pace.behind .dot { background: var(--orange); }
+  .pace .txt { flex: 1; min-width: 0; }
+  .pace .txt b { font-size: 14px; display:block; }
+  .pace .txt small { font-size: 12px; color: var(--muted); }
+  .pace .edit { font-size: 12px; font-weight: bold; color: var(--orange); padding: 8px 6px; white-space:nowrap; }
+
+  /* ---------- sections ---------- */
+  section { padding: 0 16px; }
+  .sec-head { display:flex; align-items:baseline; justify-content:space-between; margin: 24px 2px 10px; }
+  .sec-head h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--muted); font-weight: bold; }
+  .sec-head button { font-size: 12px; font-weight:bold; color: var(--orange); padding:4px 2px; }
+
+  /* ---------- up next card ---------- */
+  .next-card {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-lift);
+    overflow: hidden; position: relative;
+  }
+  .next-card .pbar { height: 6px; }
+  .next-card .body { padding: 16px; }
+  .next-card .tag { display:inline-block; font-size: 11px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; color:#fff; }
+  .next-card h3 { font-size: 19px; margin-top: 10px; letter-spacing:-.2px; line-height:1.3; }
+  .next-card .meta { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .next-card .meta .late { color: var(--orange); font-weight: bold; }
+  .next-card .mnemo { font-size: 12px; font-style: italic; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .next-actions { display:flex; gap: 10px; padding: 0 16px 16px; }
+  .btn { flex:1; border-radius: 10px; padding: 13px 10px; font-size: 14px; font-weight: bold; transition: transform .08s ease, opacity .15s; text-align:center; }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity:.5; pointer-events:none; }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-ghost { background: var(--orange-soft); color: var(--orange); }
+  .btn-navy { background: var(--navy); color:#fff; }
+  .all-done {
+    background: var(--green-soft); border-radius: var(--radius); padding: 22px 18px; text-align:center;
+  }
+  .all-done b { color: var(--green); font-size: 17px; display:block; }
+  .all-done small { color: var(--muted); font-size: 13px; }
+
+  /* ---------- phase arc ---------- */
+  .phase-arc { display:flex; gap: 5px; }
+  .ph { flex: 1; border-radius: 9px; padding: 9px 4px 8px; text-align:center; background: var(--card); box-shadow: var(--shadow); position:relative; border: 2px solid transparent; }
+  .ph.current { border-color: var(--navy); }
+  .ph .ph-label { font-size: 10px; font-weight: bold; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
+  .ph .ph-count { font-size: 13px; font-weight: bold; margin-top: 2px; }
+  .ph .ph-track { height: 4px; border-radius: 2px; background: var(--line); margin: 7px 6px 0; overflow:hidden; }
+  .ph .ph-fill { height:100%; border-radius:2px; transition: width .5s ease; }
+  .ph .ph-days { font-size: 9px; color: var(--muted); margin-top: 5px; }
+
+  /* ---------- pillar grid ---------- */
+  .pillars { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pillar-card {
+    background: var(--card); border-radius: 12px; box-shadow: var(--shadow);
+    padding: 13px 13px 12px; text-align:left; position:relative; overflow:hidden;
+    transition: transform .08s ease;
+  }
+  .pillar-card:active { transform: scale(.97); }
+  .pillar-card .stripe { position:absolute; left:0; top:0; bottom:0; width:5px; }
+  .pillar-card .code { font-size: 17px; font-weight: bold; letter-spacing: .5px; }
+  .pillar-card .pname { font-size: 12px; font-weight: bold; margin-top: 1px; line-height: 1.25; min-height: 2.5em; }
+  .pillar-card .pcount { font-size: 11px; color: var(--muted); margin-top: 5px; }
+  .pillar-card .ptrack { height: 5px; background: var(--line); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .pillar-card .pfill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+  .pillar-card.done-all::after { content:"✓"; position:absolute; top:10px; right:12px; font-weight:bold; font-size:14px; color:var(--green); }
+
+  /* ---------- full path view ---------- */
+  .path-phase { margin-top: 22px; }
+  .path-phase-head { display:flex; align-items:center; gap:10px; padding: 0 2px 8px; }
+  .path-phase-head .num { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 13px; font-weight: bold; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .path-phase-head h3 { font-size: 15px; }
+  .path-phase-head small { font-size: 11px; color: var(--muted); margin-left:auto; white-space:nowrap; }
+  .pillar-block { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); overflow:hidden; margin-bottom: 10px; }
+  .pillar-block-head { display:flex; align-items:center; gap: 9px; padding: 11px 14px; color:#fff; }
+  .pillar-block-head b { font-size: 13px; letter-spacing:.3px; }
+  .pillar-block-head small { margin-left:auto; font-size: 11px; opacity:.85; }
+  .lesson-row { display:flex; align-items:center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--line); width:100%; text-align:left; }
+  .lesson-row:active { background: var(--paper); }
+  .lesson-row .check {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line);
+    flex-shrink: 0; display:flex; align-items:center; justify-content:center;
+    font-size: 13px; font-weight: bold; color:#fff; transition: all .15s ease;
+  }
+  .lesson-row.s-complete .check { background: var(--green); border-color: var(--green); }
+  .lesson-row.s-in_progress .check { border-color: var(--orange); }
+  .lesson-row.s-in_progress .check::after { content:""; width: 10px; height: 10px; border-radius:50%; background: var(--orange); }
+  .lesson-row .l-txt { flex:1; min-width:0; }
+  .lesson-row .l-title { font-size: 14px; line-height: 1.3; }
+  .lesson-row.s-complete .l-title { color: var(--muted); }
+  .lesson-row .l-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .lesson-row .l-meta .late { color: var(--orange); font-weight: bold; }
+  .lesson-row .l-meta .donedate { color: var(--green); }
+  .lesson-row .l-id { font-size: 11px; font-weight: bold; color: var(--muted); flex-shrink:0; }
+
+  /* ---------- bottom nav ---------- */
+  .nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    background: var(--card); border-top: 1px solid var(--line);
+    display:flex; max-width: inherit;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .nav-inner { display:flex; width:100%; max-width: 520px; margin: 0 auto; }
+  @media (min-width:760px){ .nav-inner { max-width: 680px; } }
+  .nav button { flex:1; padding: 11px 0 9px; font-size: 11px; font-weight: bold; color: var(--muted); display:flex; flex-direction:column; align-items:center; gap:3px; letter-spacing:.4px; }
+  .nav button.active { color: var(--orange); }
+  .nav .ico { font-size: 19px; line-height: 1; }
+
+  /* ---------- sign-in ---------- */
+  .gate {
+    min-height: 100vh; display:flex; flex-direction:column; justify-content:center;
+    background: linear-gradient(170deg, var(--navy) 0%, var(--navy-2) 55%, #232340 100%);
+    padding: 32px 24px; color: #fff;
+  }
+  .gate .gate-card { max-width: 420px; margin: 0 auto; width: 100%; }
+  .gate .wordmark { font-size: 15px; }
+  .gate h1 { font-size: 30px; margin-top: 26px; line-height: 1.2; letter-spacing:-.3px; }
+  .gate h1 em { font-style: normal; color: var(--orange); }
+  .gate p { color: rgba(255,255,255,.7); font-size: 14px; margin-top: 12px; }
+  .gate form { margin-top: 28px; }
+  .gate input {
+    width: 100%; padding: 15px 16px; border-radius: 11px; border: 1.5px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.07); color: #fff; font-size: 16px; font-family: inherit;
+    outline: none; transition: border-color .15s;
+  }
+  .gate input::placeholder { color: rgba(255,255,255,.4); }
+  .gate input:focus { border-color: var(--orange); }
+  .gate .btn-primary { width: 100%; margin-top: 14px; padding: 15px; font-size: 15px; }
+  .gate .note { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 16px; text-align:center; }
+  .gate .err { background: rgba(184,50,50,.25); border:1px solid rgba(184,50,50,.6); color:#FFD9D9; border-radius:10px; padding: 11px 14px; font-size: 13px; margin-top: 16px; }
+  .gate .sent { background: rgba(46,125,79,.22); border: 1px solid rgba(46,125,79,.55); border-radius: 12px; padding: 18px 16px; margin-top: 26px; }
+  .gate .sent b { display:block; font-size: 16px; }
+  .gate .sent small { color: rgba(255,255,255,.65); font-size: 13px; display:block; margin-top: 6px; line-height:1.5; }
+  .gate .linkbtn { color: var(--orange); font-weight: bold; font-size: 13px; margin-top: 14px; padding: 6px 2px; }
+  .gate .footerline { text-align:center; font-size: 11px; color: rgba(255,255,255,.3); margin-top: 40px; letter-spacing: .5px; }
+
+  /* ---------- loading ---------- */
+  .loading { min-height: 100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 18px; background: var(--navy); color: rgba(255,255,255,.7); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+  .spinner { width: 34px; height: 34px; border: 3px solid rgba(255,255,255,.15); border-top-color: var(--orange); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- pace sheet ---------- */
+  .sheet-veil { position: fixed; inset: 0; background: rgba(26,26,46,.5); z-index: 90; opacity: 0; transition: opacity .2s; }
+  .sheet-veil.show { opacity: 1; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 95;
+    background: var(--card); border-radius: 18px 18px 0 0;
+    padding: 10px 20px calc(env(safe-area-inset-bottom, 0px) + 22px);
+    transform: translateY(105%); transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    max-width: 560px; margin: 0 auto; box-shadow: 0 -10px 40px rgba(26,26,46,.25);
+  }
+  .sheet.show { transform: translateY(0); }
+  .sheet .grip { width: 38px; height: 4px; border-radius: 2px; background: var(--line); margin: 4px auto 14px; }
+  .sheet h3 { font-size: 18px; }
+  .sheet .sheet-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .pace-facts { display:flex; gap: 10px; margin-top: 16px; }
+  .pace-fact { flex:1; background: var(--paper); border-radius: 10px; padding: 11px 12px; }
+  .pace-fact small { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: bold; display:block; }
+  .pace-fact b { font-size: 15px; display:block; margin-top: 3px; }
+  .sheet label { display:block; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 8px; }
+  .ppm-row { display:flex; gap: 8px; }
+  .ppm { flex:1; padding: 12px 4px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); font-size: 15px; font-weight: bold; color: var(--ink); transition: all .12s; }
+  .ppm.sel { border-color: var(--orange); background: var(--orange-soft); color: var(--orange); }
+  .sheet input[type="date"] {
+    width: 100%; padding: 13px 14px; border-radius: 10px; border: 1.5px solid var(--line);
+    font-size: 15px; font-family: inherit; background: var(--card); color: var(--ink);
+  }
+  .sheet .cap-note { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+  .sheet .cap-warn { color: var(--orange); font-weight: bold; }
+  .sheet .btn-primary { width: 100%; margin-top: 18px; padding: 14px; }
+
+  /* ---------- toast ---------- */
+  .toast {
+    position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy); color: #fff; font-size: 13px; padding: 11px 18px;
+    border-radius: 24px; box-shadow: var(--shadow-lift); z-index: 99;
+    opacity: 0; transition: all .25s ease; max-width: 88%; text-align: center; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.warn { background: var(--orange); }
+
+  /* page-load reveal */
+  .reveal { animation: rise .45s ease both; }
+  .reveal:nth-child(2) { animation-delay: .05s; } .reveal:nth-child(3) { animation-delay: .1s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<!-- ============ LOADING ============ -->
+<div id="view-loading" class="loading hidden">
+  <div class="spinner"></div>
+  <div id="loading-msg">Signing you in</div>
+</div>
+
+<!-- ============ SIGN-IN GATE ============ -->
+<div id="view-gate" class="gate hidden">
+  <div class="gate-card">
+    <div class="wordmark"><span class="sila">SILA</span> SERVICES</div>
+    <h1>Your GM<br>Learning <em>Path</em></h1>
+    <p>35 lessons across the eight PERFORMS pillars — your year-one path to running the complete operation. Sign in with your work email and we'll send you a one-tap link.</p>
+
+    <div id="gate-error" class="err hidden"></div>
+
+    <form id="gate-form">
+      <input type="email" id="gate-email" placeholder="you@sila.com" autocomplete="email" inputmode="email" required>
+      <button type="submit" class="btn btn-primary" id="gate-submit">Email me a sign-in link</button>
+    </form>
+    <div class="note">No password needed. The link works for 15 minutes.</div>
+
+    <div id="gate-sent" class="sent hidden">
+      <b>Check your email</b>
+      <small>We sent a sign-in link to <span id="sent-to"></span>. Open it on this device — it's good for 15 minutes and works once.</small>
+      <button class="linkbtn" id="gate-resend">Send a new link</button>
+    </div>
+
+    <div class="footerline">SILA SERVICES · GM SUCCESS COACH PROGRAM</div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="view-app" class="hidden">
+  <div class="shell">
+
+    <div class="band">
+      <div class="brandline">
+        <div class="wordmark"><span class="sila">SILA</span> SERVICES</div>
+        <button class="signout" id="btn-signout">Sign out</button>
+      </div>
+      <h1 id="hd-title">GM Learning Path</h1>
+      <div class="sub" id="hd-sub"></div>
+      <div class="bigstat"><b id="hd-count">0</b><span>of 35 lessons complete</span></div>
+      <div class="ring-row">
+        <div class="overall-track"><div class="overall-fill" id="hd-fill" style="width:0%"></div></div>
+        <span style="font-size:13px;color:rgba(255,255,255,.7)" id="hd-pct">0%</span>
+      </div>
+    </div>
+
+    <button class="pace" id="pace-banner">
+      <div class="dot"></div>
+      <div class="txt"><b id="pace-line">Loading…</b><small id="pace-sub"></small></div>
+      <span class="edit">Adjust pace</span>
+    </button>
+
+    <!-- ===== HOME TAB ===== -->
+    <div id="tab-home">
+      <section class="reveal">
+        <div class="sec-head"><h2>Up Next</h2></div>
+        <div id="next-slot"></div>
+      </section>
+
+      <section class="reveal">
+        <div class="sec-head"><h2>Your Four Phases</h2></div>
+        <div class="phase-arc" id="phase-arc"></div>
+      </section>
+
+      <section class="reveal">
+        <div class="sec-head"><h2>The Eight Pillars</h2><button id="btn-viewpath">Full path →</button></div>
+        <div class="pillars" id="pillar-grid"></div>
+      </section>
+    </div>
+
+    <!-- ===== PATH TAB ===== -->
+    <div id="tab-path" class="hidden">
+      <section>
+        <div class="sec-head" style="margin-top:24px"><h2>The Full Path — 35 Lessons</h2></div>
+        <div style="font-size:12px;color:var(--muted);padding:0 2px 4px">Tap a lesson to advance it: not started → in progress → complete. Tap a completed lesson to undo.</div>
+        <div id="path-list"></div>
+      </section>
+    </div>
+
+  </div>
+
+  <nav class="nav"><div class="nav-inner">
+    <button id="nav-home" class="active"><span class="ico">⌂</span>Home</button>
+    <button id="nav-path"><span class="ico">☰</span>Full Path</button>
+  </div></nav>
+</div>
+
+<!-- ============ PACE SHEET ============ -->
+<div id="sheet-veil" class="sheet-veil hidden"></div>
+<div id="pace-sheet" class="sheet">
+  <div class="grip"></div>
+  <h3>Set your pace</h3>
+  <div class="sheet-sub">You choose the speed. Everything must finish within 12 months of your start date.</div>
+  <div class="pace-facts">
+    <div class="pace-fact"><small>Started</small><b id="pf-start">—</b></div>
+    <div class="pace-fact"><small>Target finish</small><b id="pf-finish">—</b></div>
+    <div class="pace-fact"><small>Hard cap</small><b id="pf-cap">—</b></div>
+  </div>
+  <label>Lessons per month</label>
+  <div class="ppm-row" id="ppm-row">
+    <button class="ppm" data-ppm="3">3<br><span style="font-size:10px;font-weight:normal">~12 mo</span></button>
+    <button class="ppm" data-ppm="4">4<br><span style="font-size:10px;font-weight:normal">~9 mo</span></button>
+    <button class="ppm" data-ppm="5">5<br><span style="font-size:10px;font-weight:normal">~7 mo</span></button>
+    <button class="ppm" data-ppm="6">6<br><span style="font-size:10px;font-weight:normal">~6 mo</span></button>
+  </div>
+  <label>Or pick an exact finish date</label>
+  <input type="date" id="pace-date">
+  <div class="cap-note" id="pace-note">3 lessons a month finishes the path in about a year — the recommended cadence.</div>
+  <button class="btn btn-primary" id="pace-save">Save pace</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* =====================================================================
+   CONFIG
+   ===================================================================== */
+const API = "https://sila-gm-agent.edwardbmcfarlane.workers.dev";
+const SESSION_KEY = "sila_gm_session";
+const TOTAL = 35;
+
+const PHASES = {
+  1: { label: "Phase 1", days: "Days 1–30",  hint: "Survive & orient" },
+  2: { label: "Phase 2", days: "Days 31–60", hint: "Lead the people" },
+  3: { label: "Phase 3", days: "Days 61–90", hint: "Build the systems" },
+  4: { label: "Phase 4", days: "Post-90",    hint: "Lead from vision" }
+};
+const PHASE_COLOR = { 1: "#2D7DD2", 2: "#BA7517", 3: "#534AB7", 4: "#A63265" };
+const PILLAR_ORDER_BY_PHASE = { 1: ["E","F"], 2: ["P","O"], 3: ["R","Rc","M"], 4: ["S"] };
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+let S = null;          // { progress, catalog, pillars, schedule }
+let session = localStorage.getItem(SESSION_KEY) || null;
+let pendingPace = {};  // sheet selection
+
+/* =====================================================================
+   UTILITIES
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+function fmtDate(iso, withYear) {
+  if (!iso) return "—";
+  const d = new Date(iso + "T00:00:00");
+  const opts = { month: "short", day: "numeric" };
+  if (withYear) opts.year = "numeric";
+  return d.toLocaleDateString("en-US", opts);
+}
+function addMonthsISO(iso, n) {
+  const d = new Date(iso + "T00:00:00Z");
+  d.setUTCMonth(d.getUTCMonth() + n);
+  return d.toISOString().slice(0, 10);
+}
+let toastTimer = null;
+function toast(msg, warn) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (warn ? " warn" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+/* =====================================================================
+   API LAYER
+   ===================================================================== */
+async function api(path, opts = {}) {
+  const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
+  if (session) headers["Authorization"] = "Bearer " + session;
+  const r = await fetch(API + path, { ...opts, headers });
+  if (r.status === 401) { signOut(false); throw new Error("unauthorized"); }
+  if (!r.ok) {
+    let msg = "Something went wrong (" + r.status + ")";
+    try { const j = await r.json(); if (j.error) msg = j.error; } catch (_) {}
+    throw new Error(msg);
+  }
+  return r.json();
+}
+
+/* =====================================================================
+   VIEWS / ROUTING
+   ===================================================================== */
+function show(view) {
+  ["view-loading", "view-gate", "view-app"].forEach(v => $(v).classList.add("hidden"));
+  $(view).classList.remove("hidden");
+}
+function showTab(tab) {
+  $("tab-home").classList.toggle("hidden", tab !== "home");
+  $("tab-path").classList.toggle("hidden", tab !== "path");
+  $("nav-home").classList.toggle("active", tab === "home");
+  $("nav-path").classList.toggle("active", tab === "path");
+  window.scrollTo({ top: 0 });
+}
+
+/* =====================================================================
+   BOOT — handle magic-link return, stored session, or gate
+   ===================================================================== */
+async function boot() {
+  const params = new URLSearchParams(location.search);
+  const token = params.get("token");
+
+  if (token) {
+    show("view-loading"); $("loading-msg").textContent = "Signing you in";
+    history.replaceState({}, "", location.pathname); // strip ?token= immediately
+    try {
+      const data = await api("/auth/verify?token=" + encodeURIComponent(token));
+      session = data.session;
+      localStorage.setItem(SESSION_KEY, session);
+      S = data;
+      renderAll();
+      show("view-app");
+      return;
+    } catch (e) {
+      session = null; localStorage.removeItem(SESSION_KEY);
+      show("view-gate");
+      gateError("That sign-in link has expired or was already used. Enter your email and we'll send a fresh one.");
+      return;
+    }
+  }
+
+  if (session) {
+    show("view-loading"); $("loading-msg").textContent = "Loading your path";
+    try {
+      S = await api("/progress");
+      renderAll();
+      show("view-app");
+      return;
+    } catch (e) { /* falls through to gate (401 already cleared session) */ }
+  }
+  show("view-gate");
+}
+
+function gateError(msg) {
+  const el = $("gate-error");
+  el.textContent = msg;
+  el.classList.remove("hidden");
+}
+
+function signOut(confirmFirst = true) {
+  if (confirmFirst && !confirm("Sign out? Your progress is saved — you can sign back in any time with a new email link.")) return;
+  session = null;
+  localStorage.removeItem(SESSION_KEY);
+  S = null;
+  $("gate-sent").classList.add("hidden");
+  $("gate-form").classList.remove("hidden");
+  $("gate-error").classList.add("hidden");
+  show("view-gate");
+}
+
+/* =====================================================================
+   SIGN-IN FLOW
+   ===================================================================== */
+let lastEmail = "";
+async function requestLink(email) {
+  const btn = $("gate-submit");
+  btn.disabled = true; btn.textContent = "Sending…";
+  try {
+    await api("/auth/request", { method: "POST", body: JSON.stringify({ email }) });
+    lastEmail = email;
+    $("sent-to").textContent = email;
+    $("gate-form").classList.add("hidden");
+    $("gate-error").classList.add("hidden");
+    $("gate-sent").classList.remove("hidden");
+  } catch (e) {
+    gateError("Couldn't send the link — check the address and try again. If it keeps failing, contact Eddie McFarlane (emcfarlane@sila.com).");
+  } finally {
+    btn.disabled = false; btn.textContent = "Email me a sign-in link";
+  }
+}
+
+/* =====================================================================
+   DERIVED STATE
+   ===================================================================== */
+function lessonsBySeq() {
+  return [...S.catalog].sort((a, b) => a.seq - b.seq);
+}
+function statusOf(id) {
+  return (S.progress.lessons[id] || {}).status || "not_started";
+}
+function completeCount() {
+  return Object.values(S.progress.lessons).filter(l => l.status === "complete").length;
+}
+function nextLesson() {
+  return lessonsBySeq().find(l => statusOf(l.id) !== "complete") || null;
+}
+/** behind / on-pace / ahead: lessons due by today vs lessons complete */
+function paceStatus() {
+  const today = todayISO();
+  const dueByNow = S.catalog.filter(l => S.schedule[l.id] <= today).length;
+  const done = completeCount();
+  const diff = done - dueByNow;
+  if (diff < 0) return { state: "behind", n: -diff };
+  if (diff === 0) return { state: "ok", n: 0 };
+  return { state: "ahead", n: diff };
+}
+function phaseCounts() {
+  const out = {};
+  for (const ph of [1, 2, 3, 4]) {
+    const ls = S.catalog.filter(l => l.phase === ph);
+    out[ph] = { total: ls.length, done: ls.filter(l => statusOf(l.id) === "complete").length };
+  }
+  return out;
+}
+function currentPhase() {
+  const pc = phaseCounts();
+  for (const ph of [1, 2, 3, 4]) if (pc[ph].done < pc[ph].total) return ph;
+  return 4;
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function renderAll() {
+  renderHeader();
+  renderPaceBanner();
+  renderNext();
+  renderPhaseArc();
+  renderPillars();
+  renderPath();
+}
+
+function renderHeader() {
+  const done = completeCount();
+  const pct = Math.round((done / TOTAL) * 100);
+  $("hd-count").textContent = done;
+  $("hd-fill").style.width = pct + "%";
+  $("hd-pct").textContent = pct + "%";
+  const name = (S.progress.email || "").split("@")[0];
+  $("hd-sub").textContent = "Started " + fmtDate(S.progress.startDate, true) + (name ? " · " + name : "");
+}
+
+function renderPaceBanner() {
+  const p = paceStatus();
+  const el = $("pace-banner");
+  el.className = "pace " + (p.state === "ok" ? "ok" : p.state);
+  const finish = fmtDate(S.progress.pace.targetFinishDate, true);
+  if (p.state === "behind") {
+    $("pace-line").textContent = p.n + (p.n === 1 ? " lesson" : " lessons") + " behind schedule";
+    $("pace-sub").textContent = "Knock out the next one to close the gap · target finish " + finish;
+  } else if (p.state === "ahead") {
+    $("pace-line").textContent = p.n + (p.n === 1 ? " lesson" : " lessons") + " ahead of schedule";
+    $("pace-sub").textContent = "Strong pace · target finish " + finish;
+  } else {
+    $("pace-line").textContent = "On pace";
+    $("pace-sub").textContent = "Right on schedule · target finish " + finish;
+  }
+}
+
+function renderNext() {
+  const slot = $("next-slot");
+  const l = nextLesson();
+  if (!l) {
+    slot.innerHTML = '<div class="all-done"><b>All 35 lessons complete.</b><small>The full PERFORMS path — done. Your coach will take it from here.</small></div>';
+    return;
+  }
+  const pillar = S.pillars[l.pillar];
+  const st = statusOf(l.id);
+  const due = S.schedule[l.id];
+  const late = due < todayISO();
+  const dueTxt = late
+    ? '<span class="late">Due ' + fmtDate(due) + ' — past due</span>'
+    : "Due " + fmtDate(due);
+  slot.innerHTML =
+    '<div class="next-card">' +
+      '<div class="pbar" style="background:' + pillar.color + '"></div>' +
+      '<div class="body">' +
+        '<span class="tag" style="background:' + pillar.color + '">' + l.id + " · " + pillar.name + "</span>" +
+        "<h3>" + l.title + "</h3>" +
+        '<div class="meta">Lesson ' + l.seq + " of 35 · " + dueTxt + "</div>" +
+        '<div class="mnemo">“' + pillar.mnemonic + '”</div>' +
+      "</div>" +
+      '<div class="next-actions">' +
+        (st === "in_progress"
+          ? '<button class="btn btn-primary" data-act="complete" data-id="' + l.id + '">Mark complete ✓</button>'
+          : '<button class="btn btn-ghost" data-act="in_progress" data-id="' + l.id + '">Start lesson</button>' +
+            '<button class="btn btn-primary" data-act="complete" data-id="' + l.id + '">Mark complete ✓</button>') +
+      "</div>" +
+    "</div>";
+}
+
+function renderPhaseArc() {
+  const pc = phaseCounts();
+  const cur = currentPhase();
+  $("phase-arc").innerHTML = [1, 2, 3, 4].map(ph => {
+    const c = pc[ph];
+    const pct = c.total ? Math.round((c.done / c.total) * 100) : 0;
+    return (
+      '<div class="ph' + (ph === cur ? " current" : "") + '">' +
+        '<div class="ph-label">' + PHASES[ph].label + "</div>" +
+        '<div class="ph-count">' + c.done + "/" + c.total + "</div>" +
+        '<div class="ph-track"><div class="ph-fill" style="width:' + pct + "%;background:" + PHASE_COLOR[ph] + '"></div></div>' +
+        '<div class="ph-days">' + PHASES[ph].days + "</div>" +
+      "</div>"
+    );
+  }).join("");
+}
+
+function renderPillars() {
+  const order = ["E", "F", "P", "O", "R", "Rc", "M", "S"]; // learning order
+  $("pillar-grid").innerHTML = order.map(code => {
+    const p = S.pillars[code];
+    const ls = S.catalog.filter(l => l.pillar === code);
+    const done = ls.filter(l => statusOf(l.id) === "complete").length;
+    const pct = Math.round((done / ls.length) * 100);
+    return (
+      '<button class="pillar-card' + (done === ls.length ? " done-all" : "") + '" data-pillar="' + code + '">' +
+        '<div class="stripe" style="background:' + p.color + '"></div>' +
+        '<div class="code" style="color:' + p.color + '">' + code + "</div>" +
+        '<div class="pname">' + p.name + "</div>" +
+        '<div class="pcount">' + done + " of " + ls.length + " complete</div>" +
+        '<div class="ptrack"><div class="pfill" style="width:' + pct + "%;background:" + p.color + '"></div></div>' +
+      "</button>"
+    );
+  }).join("");
+}
+
+function renderPath() {
+  const today = todayISO();
+  $("path-list").innerHTML = [1, 2, 3, 4].map(ph => {
+    const pillarBlocks = PILLAR_ORDER_BY_PHASE[ph].map(code => {
+      const p = S.pillars[code];
+      // M straddles phases 3–4: show each lesson under the phase it carries
+      const ls = S.catalog.filter(l => l.pillar === code && l.phase === ph).sort((a, b) => a.seq - b.seq);
+      if (!ls.length) return "";
+      const done = ls.filter(l => statusOf(l.id) === "complete").length;
+      const rows = ls.map(l => {
+        const st = statusOf(l.id);
+        const rec = S.progress.lessons[l.id] || {};
+        const due = S.schedule[l.id];
+        let meta;
+        if (st === "complete") {
+          meta = '<span class="donedate">Completed ' + fmtDate(rec.completedDate) + "</span>";
+        } else if (due < today) {
+          meta = '<span class="late">Due ' + fmtDate(due) + " — past due</span>";
+        } else {
+          meta = "Due " + fmtDate(due);
+        }
+        return (
+          '<button class="lesson-row s-' + st + '" data-lesson="' + l.id + '">' +
+            '<span class="check">' + (st === "complete" ? "✓" : "") + "</span>" +
+            '<span class="l-txt"><span class="l-title">' + l.title + '</span><span class="l-meta" style="display:block">' + meta + "</span></span>" +
+            '<span class="l-id">' + l.id + "</span>" +
+          "</button>"
+        );
+      }).join("");
+      return (
+        '<div class="pillar-block" id="pillar-' + code + '">' +
+          '<div class="pillar-block-head" style="background:' + p.color + '"><b>' + code + " · " + p.name + "</b><small>" + done + "/" + ls.length + "</small></div>" +
+          rows +
+        "</div>"
+      );
+    }).join("");
+    const pc = phaseCounts()[ph];
+    return (
+      '<div class="path-phase">' +
+        '<div class="path-phase-head"><span class="num" style="background:' + PHASE_COLOR[ph] + '">' + ph + "</span><h3>" + PHASES[ph].hint + "</h3><small>" + PHASES[ph].days + " · " + pc.done + "/" + pc.total + "</small></div>" +
+        pillarBlocks +
+      "</div>"
+    );
+  }).join("");
+
+  // M pillar lessons appear under both phase 3 and 4 with the same element id risk — fix duplicate ids
+  document.querySelectorAll('[id="pillar-M"]').forEach((el, i) => { if (i > 0) el.id = "pillar-M-2"; });
+}
+
+/* =====================================================================
+   LESSON UPDATES — optimistic with rollback
+   ===================================================================== */
+let saving = false;
+async function setLesson(lessonId, status) {
+  if (saving) return;
+  saving = true;
+  const prev = JSON.parse(JSON.stringify(S.progress.lessons[lessonId] || { status: "not_started", completedDate: null, quizScore: null }));
+  // optimistic
+  S.progress.lessons[lessonId] = {
+    ...prev,
+    status,
+    completedDate: status === "complete" ? todayISO() : null
+  };
+  renderAll();
+  try {
+    const data = await api("/progress/lesson", { method: "POST", body: JSON.stringify({ lessonId, status }) });
+    S = stripCapped(data);
+    renderAll();
+    if (status === "complete") {
+      const left = TOTAL - completeCount();
+      toast(left === 0 ? "That's all 35. Outstanding." : lessonId + " complete — " + left + " to go.");
+    }
+  } catch (e) {
+    S.progress.lessons[lessonId] = prev; // rollback
+    renderAll();
+    toast("Couldn't save that — check your connection and try again.", true);
+  } finally {
+    saving = false;
+  }
+}
+function stripCapped(data) {
+  const { capped, ...rest } = data;
+  return rest.progress ? rest : data;
+}
+function cycleLesson(lessonId) {
+  const st = statusOf(lessonId);
+  if (st === "not_started") return setLesson(lessonId, "in_progress");
+  if (st === "in_progress") return setLesson(lessonId, "complete");
+  if (confirm("Mark " + lessonId + " as not complete? Its completion date will be cleared.")) {
+    return setLesson(lessonId, "not_started");
+  }
+}
+
+/* =====================================================================
+   PACE SHEET
+   ===================================================================== */
+function openPaceSheet() {
+  pendingPace = {};
+  const p = S.progress.pace;
+  $("pf-start").textContent = fmtDate(S.progress.startDate, true);
+  $("pf-finish").textContent = fmtDate(p.targetFinishDate, true);
+  $("pf-cap").textContent = fmtDate(addMonthsISO(S.progress.startDate, 12), true);
+  document.querySelectorAll(".ppm").forEach(b => b.classList.toggle("sel", Number(b.dataset.ppm) === p.lessonsPerMonth));
+  const di = $("pace-date");
+  di.value = p.targetFinishDate;
+  di.min = todayISO();
+  di.max = addMonthsISO(S.progress.startDate, 12);
+  $("pace-note").textContent = "3 lessons a month finishes the path in about a year — the recommended cadence.";
+  $("sheet-veil").classList.remove("hidden");
+  requestAnimationFrame(() => { $("sheet-veil").classList.add("show"); $("pace-sheet").classList.add("show"); });
+}
+function closePaceSheet() {
+  $("sheet-veil").classList.remove("show");
+  $("pace-sheet").classList.remove("show");
+  setTimeout(() => $("sheet-veil").classList.add("hidden"), 220);
+}
+async function savePace() {
+  const btn = $("pace-save");
+  if (!pendingPace.lessonsPerMonth && !pendingPace.targetFinishDate) { closePaceSheet(); return; }
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const data = await api("/progress/pace", { method: "POST", body: JSON.stringify(pendingPace) });
+    const capped = data.capped;
+    S = stripCapped(data);
+    renderAll();
+    closePaceSheet();
+    toast(capped
+      ? "That pace fell outside the allowed window — set to " + fmtDate(S.progress.pace.targetFinishDate, true) + " instead."
+      : "Pace updated. New target finish: " + fmtDate(S.progress.pace.targetFinishDate, true) + ".", capped);
+  } catch (e) {
+    toast("Couldn't update your pace — try again.", true);
+  } finally {
+    btn.disabled = false; btn.textContent = "Save pace";
+  }
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+$("gate-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const email = $("gate-email").value.trim();
+  if (email) requestLink(email);
+});
+$("gate-resend").addEventListener("click", () => {
+  $("gate-sent").classList.add("hidden");
+  $("gate-form").classList.remove("hidden");
+  if (lastEmail) $("gate-email").value = lastEmail;
+});
+$("btn-signout").addEventListener("click", () => signOut(true));
+$("nav-home").addEventListener("click", () => showTab("home"));
+$("nav-path").addEventListener("click", () => showTab("path"));
+$("btn-viewpath").addEventListener("click", () => showTab("path"));
+$("pace-banner").addEventListener("click", openPaceSheet);
+$("sheet-veil").addEventListener("click", closePaceSheet);
+$("pace-save").addEventListener("click", savePace);
+
+$("ppm-row").addEventListener("click", e => {
+  const b = e.target.closest(".ppm");
+  if (!b) return;
+  document.querySelectorAll(".ppm").forEach(x => x.classList.remove("sel"));
+  b.classList.add("sel");
+  const n = Number(b.dataset.ppm);
+  pendingPace = { lessonsPerMonth: n };
+  const months = Math.ceil(TOTAL / n);
+  $("pace-note").textContent = n + " lessons a month finishes in roughly " + months + " months.";
+});
+$("pace-date").addEventListener("change", e => {
+  const v = e.target.value;
+  if (!v) return;
+  document.querySelectorAll(".ppm").forEach(x => x.classList.remove("sel"));
+  pendingPace = { targetFinishDate: v };
+  const cap = addMonthsISO(S.progress.startDate, 12);
+  $("pace-note").innerHTML = v > cap
+    ? '<span class="cap-warn">That\'s past the 12-month cap (' + fmtDate(cap, true) + ") — it will be pulled back to the cap.</span>"
+    : "Target finish set to " + fmtDate(v, true) + ". The schedule respreads all 35 lessons evenly.";
+});
+
+// Delegated: up-next actions + lesson rows + pillar cards
+document.addEventListener("click", e => {
+  const act = e.target.closest("[data-act]");
+  if (act) { setLesson(act.dataset.id, act.dataset.act); return; }
+  const row = e.target.closest("[data-lesson]");
+  if (row) { cycleLesson(row.dataset.lesson); return; }
+  const pc = e.target.closest("[data-pillar]");
+  if (pc) {
+    showTab("path");
+    const target = $("pillar-" + pc.dataset.pillar);
+    if (target) setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+  }
+});
+
+/* =====================================================================
+   GO
+   ===================================================================== */
+boot();
+</script>
+</body>
+</html>
