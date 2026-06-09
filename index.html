@@ -649,8 +649,9 @@ function renderNext() {
       "</div>" +
       '<div class="next-actions">' +
         (st === "in_progress"
-          ? '<button class="btn btn-primary" data-act="complete" data-id="' + l.id + '">Mark complete ✓</button>'
-          : '<button class="btn btn-ghost" data-act="in_progress" data-id="' + l.id + '">Start lesson</button>' +
+          ? '<button class="btn btn-ghost" data-act="open" data-id="' + l.id + '">Open in SPARC ↗</button>' +
+            '<button class="btn btn-primary" data-act="complete" data-id="' + l.id + '">Mark complete ✓</button>'
+          : '<button class="btn btn-ghost" data-act="in_progress" data-id="' + l.id + '">Start lesson ↗</button>' +
             '<button class="btn btn-primary" data-act="complete" data-id="' + l.id + '">Mark complete ✓</button>') +
       "</div>" +
     "</div>";
@@ -778,7 +779,7 @@ function stripCapped(data) {
 }
 function cycleLesson(lessonId) {
   const st = statusOf(lessonId);
-  if (st === "not_started") return setLesson(lessonId, "in_progress");
+  if (st === "not_started") { openLesson(lessonId); return setLesson(lessonId, "in_progress"); }
   if (st === "in_progress") return setLesson(lessonId, "complete");
   if (confirm("Mark " + lessonId + " as not complete? Its completion date will be cleared.")) {
     return setLesson(lessonId, "not_started");
@@ -871,9 +872,15 @@ $("pace-date").addEventListener("change", e => {
 });
 
 // Delegated: up-next actions + lesson rows + pillar cards
+function lessonById(id){ return (S && S.catalog) ? S.catalog.find(l => l.id === id) : null; }
+function openLesson(id){ const L = lessonById(id); if (L && L.url) window.open(L.url, "_blank", "noopener"); }
 document.addEventListener("click", e => {
   const act = e.target.closest("[data-act]");
-  if (act) { setLesson(act.dataset.id, act.dataset.act); return; }
+  if (act) {
+    if (act.dataset.act === "open") { openLesson(act.dataset.id); return; }
+    if (act.dataset.act === "in_progress") openLesson(act.dataset.id);
+    setLesson(act.dataset.id, act.dataset.act); return;
+  }
   const row = e.target.closest("[data-lesson]");
   if (row) { cycleLesson(row.dataset.lesson); return; }
   const pc = e.target.closest("[data-pillar]");
